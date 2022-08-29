@@ -65,6 +65,9 @@ struct BogusControlFlow : llvm::PassInfoMixin<BogusControlFlow> {
         }
 
         for (auto &BB : F) {
+            if (isa<llvm::InvokeInst>(BB.getTerminator())) {
+                return;
+            }
             if (&BB != &*(F.begin())) {
                 // not begin block
                 candidates.push_back(&BB);
@@ -112,13 +115,17 @@ struct BogusControlFlow : llvm::PassInfoMixin<BogusControlFlow> {
 
         llvm::Value *value1 = allocaCandidates.size() 
                               ? (llvm::Value *)(allocaCandidates[dist(rng) % allocaCandidates.size()]) 
-                              : new llvm::GlobalVariable(M, llvm::Type::getInt64Ty(F.getContext()), false, llvm::GlobalValue::CommonLinkage, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng), false), ""); // llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng));
+                              : new llvm::GlobalVariable(M, llvm::Type::getInt64Ty(F.getContext()), false, llvm::GlobalValue::PrivateLinkage, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng), false), ""); // llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng));
 
         llvm::Value *value2 = allocaCandidates.size() 
                               ? (llvm::Value *)(allocaCandidates[dist(rng) % allocaCandidates.size()]) 
-                              : new llvm::GlobalVariable(M, llvm::Type::getInt64Ty(F.getContext()), false, llvm::GlobalValue::CommonLinkage, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng), false), "");
+                              : new llvm::GlobalVariable(M, llvm::Type::getInt64Ty(F.getContext()), false, llvm::GlobalValue::PrivateLinkage, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng), false), "");
+        
+        if (!allocaCandidates.size()) {
+            value1 = builder.CreateLoad(llvm::Type::getInt64Ty(F.getContext()), value1, "");
+            value2 = builder.CreateLoad(llvm::Type::getInt64Ty(F.getContext()), value2, "");
+        }
 
-        // llvm::errs() << *value1 << ", " <<  *value2 << "\n"; 
         auto *a1 = llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng));
         auto *a2 = llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), dist(rng));
         
@@ -135,13 +142,6 @@ struct BogusControlFlow : llvm::PassInfoMixin<BogusControlFlow> {
         auto *v22   = builder.CreateMul(v21, v21);
         auto *v23   = builder.CreateMul(prime2, v22);
 
-        // auto *v11 = builder.CreateAdd(v1, llvm::ConstantInt::get(v1->getType(), 1));
-        // auto *v12 = builder.CreateMul(v1, v11);
-        // auto *v21 = builder.CreateAdd(v2, llvm::ConstantInt::get(v2->getType(), 1));
-        // auto *v22 = builder.CreateMul(v2, v21);
-        // auto *v31 = builder.CreateAdd(v12, v22);
-        // auto *v32 = builder.CreateURem(v31, llvm::ConstantInt::get(v31->getType(), 2));
-        
         auto *condition = new llvm::ICmpInst(*b, llvm::ICmpInst::ICMP_NE, v13, v23);
         return condition;
     }
