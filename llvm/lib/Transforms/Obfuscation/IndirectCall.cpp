@@ -41,29 +41,28 @@ struct IndirectCall : llvm::PassInfoMixin<IndirectCall> {
                             continue;
                         }
                         // get call instruction, check callee
-                        auto *callee = callInstr->getCalledFunction();
-                        if (auto *function = dyn_cast<llvm::Function>(callee)) {
+                        if (auto *callee = callInstr->getCalledFunction()) {
                             // replace origin callee with array[idx]
-                            if (functions2glob.count(function) == 0) {
-                                if (functions2key.count(function) == 0) {
+                            if (functions2glob.count(callee) == 0) {
+                                if (functions2key.count(callee) == 0) {
                                     // no key
                                     continue;
                                 }
                                 // key was generated, create new global variable now
-                                auto *funcPtr = llvm::ConstantExpr::getBitCast(function, llvm::Type::getInt8PtrTy(F.getContext()));
+                                auto *funcPtr = llvm::ConstantExpr::getBitCast(callee, llvm::Type::getInt8PtrTy(F.getContext()));
                                 funcPtr = llvm::ConstantExpr::getPtrToInt(funcPtr, llvm::Type::getInt64Ty(F.getContext()), false);
-                                funcPtr = llvm::ConstantExpr::getAdd(funcPtr, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), functions2key[function]));
-                                funcPtr = llvm::ConstantExpr::getIntToPtr(funcPtr, llvm::PointerType::get(function->getFunctionType(), 0));
-                                auto *newGlob = new llvm::GlobalVariable(M, llvm::PointerType::get(function->getFunctionType(), 0), false, llvm::GlobalValue::LinkageTypes::PrivateLinkage,
+                                funcPtr = llvm::ConstantExpr::getAdd(funcPtr, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), functions2key[callee]));
+                                funcPtr = llvm::ConstantExpr::getIntToPtr(funcPtr, llvm::PointerType::get(callee->getFunctionType(), 0));
+                                auto *newGlob = new llvm::GlobalVariable(M, llvm::PointerType::get(callee->getFunctionType(), 0), false, llvm::GlobalValue::LinkageTypes::PrivateLinkage,
                                                                          funcPtr, "");
-                                functions2glob[function] = newGlob;
+                                functions2glob[callee] = newGlob;
                             }
                             // replace the functions with newGlob
                             llvm::IRBuilder<> builder(callInstr);
-                            auto *func = builder.CreateLoad(llvm::PointerType::get(function->getFunctionType(), 0), functions2glob[function]);
+                            auto *func = builder.CreateLoad(llvm::PointerType::get(callee->getFunctionType(), 0), functions2glob[callee]);
                             auto *funcPtrInt = builder.CreatePtrToInt(func, llvm::Type::getInt64Ty(F.getContext()));
-                            auto *funcPtrIntVal = builder.CreateSub(funcPtrInt, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), functions2key[function]));
-                            auto *funcPtr = builder.CreateIntToPtr(funcPtrIntVal, llvm::PointerType::get(function->getFunctionType(), 0));
+                            auto *funcPtrIntVal = builder.CreateSub(funcPtrInt, llvm::ConstantInt::get(llvm::Type::getInt64Ty(F.getContext()), functions2key[callee]));
+                            auto *funcPtr = builder.CreateIntToPtr(funcPtrIntVal, llvm::PointerType::get(callee->getFunctionType(), 0));
                             callInstr->replaceUsesOfWith(callee, funcPtr);
                         }
                     }
