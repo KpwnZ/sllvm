@@ -130,6 +130,7 @@
 #include "llvm/Transforms/Obfuscation/StringObf.h"
 #include "llvm/Transforms/Obfuscation/InstructionObf.h"
 #include "llvm/Transforms/Obfuscation/BogusControlFlow.h"
+#include "llvm/Transforms/Obfuscation/IndirectCall.h"
 
 using namespace llvm;
 
@@ -197,6 +198,10 @@ static cl::opt<bool> EnableInstructionObfuscation(
 static cl::opt<bool> EnableBogusControlFlowObfuscation(
     "bcf", cl::init(false),
     cl::desc("Enable bogus control flow obfuscation"));
+
+static cl::opt<bool> EnableIndirectCall(
+    "indircall", cl::init(false),
+    cl::desc("Enable indirect function call"));
 
 PipelineTuningOptions::PipelineTuningOptions() {
   LoopInterleaving = true;
@@ -1840,6 +1845,8 @@ ModulePassManager PassBuilder::buildO0DefaultPipeline(OptimizationLevel Level,
   
   if (EnableStringObfuscation)
     MPM.addPass(sllvm::StringObf());
+  if (EnableIndirectCall)
+    MPM.addPass(sllvm::IndirectCall());
   if (EnableBogusControlFlowObfuscation)
     MPM.addPass(sllvm::BogusControlFlow());
   if (EnableInstructionObfuscation)
