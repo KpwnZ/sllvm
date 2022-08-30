@@ -37,6 +37,9 @@ struct IndirectCall : llvm::PassInfoMixin<IndirectCall> {
             for (auto &BB : F) {
                 for (auto &instr : BB) {
                     if (auto *callInstr = dyn_cast<llvm::CallInst>(&instr)) {
+                        if (auto *intrinsic = dyn_cast<llvm::IntrinsicInst>(&instr)) {
+                            continue;
+                        }
                         // get call instruction, check callee
                         auto *callee = callInstr->getCalledFunction();
                         if (auto *function = dyn_cast<llvm::Function>(callee)) {
