@@ -16,4 +16,5 @@ Obfuscation passes are implemented with new pass manager in llvm/lib/Transforms/
 - Better instruction substitution
 - Flatten control flow
 - Better bogus control flow
+- String obfuscation for Objective-C
 
