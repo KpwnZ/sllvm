@@ -1,0 +1,3 @@
+[submodule "llvm/lib/Transforms/Obfuscation"]
+	path = llvm/lib/Transforms/Obfuscation
+	url = https://github.com/KpwnZ/sllvm-obfuscator.git
