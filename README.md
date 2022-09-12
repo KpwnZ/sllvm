@@ -11,10 +11,11 @@ Obfuscation passes are implemented with new pass manager in llvm/lib/Transforms/
 - Objective-C String obfuscation
 - Instruction substitution
 - Bogus control flow
+- Flatten control flow
 - Simple indirect function call
 
 ## TODO
 - Better instruction substitution
-- Flatten control flow
+- Better Flatten control flow
 - Better bogus control flow
 
