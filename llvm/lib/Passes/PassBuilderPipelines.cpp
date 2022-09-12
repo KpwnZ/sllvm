@@ -131,6 +131,7 @@
 #include "llvm/Transforms/Obfuscation/InstructionObf.h"
 #include "llvm/Transforms/Obfuscation/BogusControlFlow.h"
 #include "llvm/Transforms/Obfuscation/IndirectCall.h"
+#include "llvm/Transforms/Obfuscation/Flatten.h"
 
 using namespace llvm;
 
@@ -202,6 +203,10 @@ static cl::opt<bool> EnableBogusControlFlowObfuscation(
 static cl::opt<bool> EnableIndirectCall(
     "indircall", cl::init(false),
     cl::desc("Enable indirect function call"));
+
+static cl::opt<bool> EnableFlattenObfuscation(
+    "flatten", cl::init(false),
+    cl::desc("Enable flattening control flow"));
 
 PipelineTuningOptions::PipelineTuningOptions() {
   LoopInterleaving = true;
@@ -1847,6 +1852,8 @@ ModulePassManager PassBuilder::buildO0DefaultPipeline(OptimizationLevel Level,
     MPM.addPass(sllvm::StringObf());
   if (EnableIndirectCall)
     MPM.addPass(sllvm::IndirectCall());
+  if (EnableFlattenObfuscation)
+    MPM.addPass(sllvm::Flatten());
   if (EnableBogusControlFlowObfuscation)
     MPM.addPass(sllvm::BogusControlFlow());
   if (EnableInstructionObfuscation)
