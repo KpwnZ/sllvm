@@ -1852,10 +1852,10 @@ ModulePassManager PassBuilder::buildO0DefaultPipeline(OptimizationLevel Level,
     MPM.addPass(sllvm::StringObf());
   if (EnableIndirectCall)
     MPM.addPass(sllvm::IndirectCall());
-  if (EnableFlattenObfuscation)
-    MPM.addPass(sllvm::Flatten());
   if (EnableBogusControlFlowObfuscation)
     MPM.addPass(sllvm::BogusControlFlow());
+  if (EnableFlattenObfuscation)
+    MPM.addPass(sllvm::Flatten());
   if (EnableInstructionObfuscation)
     MPM.addPass(sllvm::InstructionObf());
   return MPM;
