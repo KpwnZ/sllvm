@@ -13,6 +13,7 @@ Obfuscation passes are implemented with new pass manager in llvm/lib/Transforms/
 - Bogus control flow
 - Flatten control flow
 - Simple indirect function call
+- Indirect branching
 
 ## TODO
 - Better instruction substitution
