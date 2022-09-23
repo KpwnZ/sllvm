@@ -1359,7 +1359,7 @@ PassBuilder::buildPerModuleDefaultPipeline(OptimizationLevel Level,
     MPM.addPass(sllvm::IndirectBranch());
   if (EnableInstructionObfuscation)
     MPM.addPass(sllvm::InstructionObf());
-    
+  
   return MPM;
 }
 

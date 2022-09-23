@@ -6,7 +6,7 @@
 namespace sllvm {
 
 struct IndirectBranch : public llvm::PassInfoMixin<IndirectBranch> {
-    llvm::PreservedAnalyses run(llvm::Module &M, llvm::ModuleAnalysisManager &FAM);
+    llvm::PreservedAnalyses run(llvm::Module &M, llvm::ModuleAnalysisManager &MAM);
 };
 
 }  // namespace sllvm
