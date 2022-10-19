@@ -7,13 +7,13 @@ Obfuscation passes are implemented with new pass manager in llvm/lib/Transforms/
 - [llvm 14](https://github.com/KpwnZ/sllvm/tree/release/14.x)
 ## Features
 
-- C String obfuscation
-- Objective-C String obfuscation
-- Instruction substitution
-- Bogus control flow
-- Flatten control flow
-- Simple indirect function call
-- Indirect branching
+- `-mllvm -strobf` C String obfuscation
+- `-mllvm -strobf` Objective-C String obfuscation
+- `-mllvm -instrobf` Instruction substitution
+- `-mllvm -bcf` Bogus control flow
+- `-mllvm -flatten` Flatten control flow
+- `-mllvm -indircall` Simple indirect function call
+- `-mllvm -indirbr` Indirect branching
 
 ## TODO
 - Better instruction substitution
